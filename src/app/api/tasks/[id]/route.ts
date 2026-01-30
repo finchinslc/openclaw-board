@@ -55,6 +55,11 @@ export async function PATCH(
       if (body.status === 'IN_PROGRESS' && !currentTask.startedAt) {
         updateData.startedAt = new Date()
       }
+      // Moving to NEEDS_REVIEW: set reviewedAt
+      if (body.status === 'NEEDS_REVIEW') {
+        updateData.reviewedAt = new Date()
+        updateData.isActive = false // Agent done working
+      }
       // Moving to DONE: set completedAt
       if (body.status === 'DONE') {
         updateData.completedAt = new Date()
@@ -62,6 +67,10 @@ export async function PATCH(
       // Moving back from DONE: clear completedAt
       if (currentTask.status === 'DONE' && body.status !== 'DONE') {
         updateData.completedAt = null
+      }
+      // Moving back from NEEDS_REVIEW: clear reviewedAt
+      if (currentTask.status === 'NEEDS_REVIEW' && body.status !== 'NEEDS_REVIEW') {
+        updateData.reviewedAt = null
       }
     }
     

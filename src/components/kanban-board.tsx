@@ -22,6 +22,7 @@ import { MetricsPanel } from './metrics-panel'
 const COLUMNS: { id: TaskStatus; title: string }[] = [
   { id: 'TODO', title: 'To Do' },
   { id: 'IN_PROGRESS', title: 'In Progress' },
+  { id: 'NEEDS_REVIEW', title: 'Needs Review' },
   { id: 'DONE', title: 'Done' },
 ]
 
@@ -225,6 +226,30 @@ export function KanbanBoard() {
     }
   }
 
+  const handleApproveTask = async (taskId: string) => {
+    try {
+      await fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'DONE' }),
+      })
+    } catch (error) {
+      console.error('Failed to approve task:', error)
+    }
+  }
+
+  const handleRejectTask = async (taskId: string) => {
+    try {
+      await fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'IN_PROGRESS' }),
+      })
+    } catch (error) {
+      console.error('Failed to reject task:', error)
+    }
+  }
+
   const handleNewTask = () => {
     setEditingTask(null)
     setIsDialogOpen(true)
@@ -376,7 +401,7 @@ export function KanbanBoard() {
 
       {/* Kanban Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {COLUMNS.map(column => (
             <KanbanColumn
               key={column.id}
@@ -385,6 +410,8 @@ export function KanbanBoard() {
               tasks={getColumnTasks(column.id)}
               onEditTask={handleEditTask}
               onDeleteTask={handleDeleteTask}
+              onApproveTask={handleApproveTask}
+              onRejectTask={handleRejectTask}
             />
           ))}
         </div>

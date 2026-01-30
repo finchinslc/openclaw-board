@@ -18,7 +18,7 @@ export interface Task {
   id: string
   title: string
   description: string | null
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE'
+  status: 'TODO' | 'IN_PROGRESS' | 'NEEDS_REVIEW' | 'DONE'
   priority: 'LOW' | 'MEDIUM' | 'HIGH'
   tags: string[]
   position: number
@@ -27,6 +27,7 @@ export interface Task {
   archived: boolean
   archivedAt: string | null
   startedAt: string | null
+  reviewedAt: string | null
   completedAt: string | null
   createdAt: string
   updatedAt: string

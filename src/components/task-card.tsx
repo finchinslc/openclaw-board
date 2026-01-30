@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Task } from '@/types/task'
 import { Draggable } from '@hello-pangea/dnd'
-import { Bot, Clock, ListChecks, MessageSquare, Pencil, Trash2 } from 'lucide-react'
+import { Bot, Check, Clock, ListChecks, MessageSquare, Pencil, RotateCcw, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +13,8 @@ interface TaskCardProps {
   index: number
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
+  onApprove?: (taskId: string) => void
+  onReject?: (taskId: string) => void
 }
 
 const priorityColors = {
@@ -21,7 +23,7 @@ const priorityColors = {
   HIGH: 'bg-primary',
 }
 
-export function TaskCard({ task, index, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }: TaskCardProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -144,6 +146,35 @@ export function TaskCard({ task, index, onEdit, onDelete }: TaskCardProps) {
                   </span>
                 )}
               </div>
+
+              {/* Approve/Reject buttons for NEEDS_REVIEW */}
+              {task.status === 'NEEDS_REVIEW' && onApprove && onReject && (
+                <div className="flex gap-2 mt-3 pt-3 border-t">
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onApprove(task.id)
+                    }}
+                  >
+                    <Check className="h-3 w-3 mr-1" />
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onReject(task.id)
+                    }}
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Revise
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

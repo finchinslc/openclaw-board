@@ -11,15 +11,18 @@ interface KanbanColumnProps {
   tasks: Task[]
   onEditTask: (task: Task) => void
   onDeleteTask: (taskId: string) => void
+  onApproveTask?: (taskId: string) => void
+  onRejectTask?: (taskId: string) => void
 }
 
-const columnStyles = {
+const columnStyles: Record<TaskStatus, string> = {
   TODO: 'border-t-slate-500',
   IN_PROGRESS: 'border-t-primary',
+  NEEDS_REVIEW: 'border-t-amber-500',
   DONE: 'border-t-emerald-500',
 }
 
-export function KanbanColumn({ id, title, tasks, onEditTask, onDeleteTask }: KanbanColumnProps) {
+export function KanbanColumn({ id, title, tasks, onEditTask, onDeleteTask, onApproveTask, onRejectTask }: KanbanColumnProps) {
   return (
     <div className={cn(
       'bg-muted/50 rounded-lg border-t-4 min-h-[500px] flex flex-col',
@@ -51,6 +54,8 @@ export function KanbanColumn({ id, title, tasks, onEditTask, onDeleteTask }: Kan
                 index={index}
                 onEdit={onEditTask}
                 onDelete={onDeleteTask}
+                onApprove={onApproveTask}
+                onReject={onRejectTask}
               />
             ))}
             {provided.placeholder}

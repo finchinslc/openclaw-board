@@ -10,6 +10,7 @@ datasource db {
 enum TaskStatus {
   TODO
   IN_PROGRESS
+  NEEDS_REVIEW
   DONE
 }
 
@@ -32,6 +33,7 @@ model Task {
   archived      Boolean    @default(false)
   archivedAt    DateTime?
   startedAt     DateTime?  // When moved to IN_PROGRESS
+  reviewedAt    DateTime?  // When moved to NEEDS_REVIEW
   completedAt   DateTime?  // When moved to DONE
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
