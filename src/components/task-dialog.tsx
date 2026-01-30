@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -17,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Task, Priority, Comment } from '@/types/task'
-import { MessageSquare, Send } from 'lucide-react'
+import { Task, Priority, Comment, Subtask } from '@/types/task'
+import { MessageSquare, Send, ListChecks, Plus, X } from 'lucide-react'
 
 interface TaskDialogProps {
   open: boolean
@@ -36,6 +37,9 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const [isSubmittingComment, setIsSubmittingComment] = useState(false)
+  const [newSubtask, setNewSubtask] = useState('')
+  const [subtasks, setSubtasks] = useState<Subtask[]>([])
+  const [isSubmittingSubtask, setIsSubmittingSubtask] = useState(false)
 
   useEffect(() => {
     if (task) {
@@ -45,6 +49,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
       setTags(task.tags.join(', '))
       setStoryPoints(task.storyPoints?.toString() || '')
       setComments(task.comments || [])
+      setSubtasks(task.subtasks || [])
     } else {
       setTitle('')
       setDescription('')
@@ -52,8 +57,10 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
       setTags('')
       setStoryPoints('')
       setComments([])
+      setSubtasks([])
     }
     setNewComment('')
+    setNewSubtask('')
   }, [task, open])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -92,6 +99,65 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
     }
   }
 
+  const handleAddSubtask = async () => {
+    if (!task || !newSubtask.trim()) return
+    
+    setIsSubmittingSubtask(true)
+    try {
+      const res = await fetch(`/api/tasks/${task.id}/subtasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newSubtask.trim() }),
+      })
+      
+      if (res.ok) {
+        const subtask = await res.json()
+        setSubtasks(prev => [...prev, subtask])
+        setNewSubtask('')
+      }
+    } catch (error) {
+      console.error('Failed to add subtask:', error)
+    } finally {
+      setIsSubmittingSubtask(false)
+    }
+  }
+
+  const handleToggleSubtask = async (subtask: Subtask) => {
+    if (!task) return
+    
+    try {
+      const res = await fetch(`/api/tasks/${task.id}/subtasks`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subtaskId: subtask.id, completed: !subtask.completed }),
+      })
+      
+      if (res.ok) {
+        setSubtasks(prev => 
+          prev.map(s => s.id === subtask.id ? { ...s, completed: !s.completed } : s)
+        )
+      }
+    } catch (error) {
+      console.error('Failed to toggle subtask:', error)
+    }
+  }
+
+  const handleDeleteSubtask = async (subtaskId: string) => {
+    if (!task) return
+    
+    try {
+      const res = await fetch(`/api/tasks/${task.id}/subtasks?subtaskId=${subtaskId}`, {
+        method: 'DELETE',
+      })
+      
+      if (res.ok) {
+        setSubtasks(prev => prev.filter(s => s.id !== subtaskId))
+      }
+    } catch (error) {
+      console.error('Failed to delete subtask:', error)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
@@ -101,6 +167,8 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
       minute: '2-digit',
     })
   }
+
+  const completedSubtasks = subtasks.filter(s => s.completed).length
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -171,6 +239,73 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
               placeholder="Comma-separated tags"
             />
           </div>
+
+          {/* Subtasks Section - only show for existing tasks */}
+          {task && (
+            <div className="border-t pt-4 mt-4">
+              <label className="text-sm font-medium flex items-center gap-2 mb-3">
+                <ListChecks className="h-4 w-4" />
+                Subtasks {subtasks.length > 0 && `(${completedSubtasks}/${subtasks.length})`}
+              </label>
+              
+              {subtasks.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {subtasks.map((subtask) => (
+                    <div 
+                      key={subtask.id} 
+                      className="flex items-center gap-2 group"
+                    >
+                      <Checkbox
+                        id={subtask.id}
+                        checked={subtask.completed}
+                        onCheckedChange={() => handleToggleSubtask(subtask)}
+                      />
+                      <label
+                        htmlFor={subtask.id}
+                        className={`flex-1 text-sm cursor-pointer ${
+                          subtask.completed ? 'line-through text-muted-foreground' : ''
+                        }`}
+                      >
+                        {subtask.title}
+                      </label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleDeleteSubtask(subtask.id)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <Input
+                  value={newSubtask}
+                  onChange={(e) => setNewSubtask(e.target.value)}
+                  placeholder="Add a subtask..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleAddSubtask()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="secondary"
+                  onClick={handleAddSubtask}
+                  disabled={!newSubtask.trim() || isSubmittingSubtask}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Comments Section - only show for existing tasks */}
           {task && (

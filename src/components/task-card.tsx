@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Task } from '@/types/task'
 import { Draggable } from '@hello-pangea/dnd'
-import { Bot, Clock, MessageSquare, Pencil, Trash2 } from 'lucide-react'
+import { Bot, Clock, ListChecks, MessageSquare, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -125,6 +125,12 @@ export function TaskCard({ task, index, onEdit, onDelete }: TaskCardProps) {
                     <div className="flex items-center">
                       <MessageSquare className="h-3 w-3 mr-1" />
                       {task.comments.length}
+                    </div>
+                  )}
+                  {task.subtasks && task.subtasks.length > 0 && (
+                    <div className="flex items-center">
+                      <ListChecks className="h-3 w-3 mr-1" />
+                      {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
                     </div>
                   )}
                 </div>

@@ -16,7 +16,10 @@ export async function GET(
     const { id } = await params
     const task = await prisma.task.findUnique({ 
       where: { id },
-      include: { comments: { orderBy: { createdAt: 'asc' } } },
+      include: { 
+        comments: { orderBy: { createdAt: 'asc' } },
+        subtasks: { orderBy: { position: 'asc' } },
+      },
     })
     
     if (!task) {
@@ -65,7 +68,10 @@ export async function PATCH(
     const task = await prisma.task.update({
       where: { id },
       data: updateData,
-      include: { comments: { orderBy: { createdAt: 'asc' } } },
+      include: { 
+        comments: { orderBy: { createdAt: 'asc' } },
+        subtasks: { orderBy: { position: 'asc' } },
+      },
     })
     
     broadcast('task:updated', task)

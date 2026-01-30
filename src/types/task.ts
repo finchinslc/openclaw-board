@@ -5,6 +5,15 @@ export interface Comment {
   createdAt: string
 }
 
+export interface Subtask {
+  id: string
+  title: string
+  completed: boolean
+  position: number
+  taskId: string
+  createdAt: string
+}
+
 export interface Task {
   id: string
   title: string
@@ -20,6 +29,7 @@ export interface Task {
   createdAt: string
   updatedAt: string
   comments?: Comment[]
+  subtasks?: Subtask[]
 }
 
 export type TaskStatus = Task['status']
