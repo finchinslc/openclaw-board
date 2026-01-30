@@ -57,57 +57,83 @@ export function KanbanBoard() {
   }, [fetchTasks])
 
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`)
+    let ws: WebSocket | null = null
+    let reconnectTimeout: NodeJS.Timeout | null = null
+    let reconnectAttempts = 0
+    const maxReconnectDelay = 30000 // 30 seconds max
+    const baseDelay = 1000 // Start with 1 second
+    let isCleaningUp = false
 
-    ws.onopen = () => {
-      console.log('WebSocket connected')
-      setIsConnected(true)
-    }
-
-    ws.onclose = () => {
-      console.log('WebSocket disconnected')
-      setIsConnected(false)
-    }
-
-    ws.onmessage = (event) => {
-      const { event: eventType, data } = JSON.parse(event.data)
+    const connect = () => {
+      if (isCleaningUp) return
       
-      switch (eventType) {
-        case 'task:created':
-          if (!data.archived) {
-            setTasks(prev => [...prev, data])
-          }
-          setMetricsRefresh(n => n + 1)
-          break
-        case 'task:updated':
-          if (data.archived) {
-            // Remove from board if archived
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws`)
+
+      ws.onopen = () => {
+        console.log('WebSocket connected')
+        setIsConnected(true)
+        reconnectAttempts = 0 // Reset on successful connection
+        // Refresh tasks on reconnect to sync state
+        fetchTasks()
+      }
+
+      ws.onclose = () => {
+        console.log('WebSocket disconnected')
+        setIsConnected(false)
+        
+        if (!isCleaningUp) {
+          // Exponential backoff: 1s, 2s, 4s, 8s... up to 30s
+          const delay = Math.min(baseDelay * Math.pow(2, reconnectAttempts), maxReconnectDelay)
+          reconnectAttempts++
+          console.log(`Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})...`)
+          reconnectTimeout = setTimeout(connect, delay)
+        }
+      }
+
+      ws.onmessage = (event) => {
+        const { event: eventType, data } = JSON.parse(event.data)
+        
+        switch (eventType) {
+          case 'task:created':
+            if (!data.archived) {
+              setTasks(prev => [...prev, data])
+            }
+            setMetricsRefresh(n => n + 1)
+            break
+          case 'task:updated':
+            if (data.archived) {
+              // Remove from board if archived
+              setTasks(prev => prev.filter(t => t.id !== data.id))
+            } else {
+              setTasks(prev => prev.map(t => t.id === data.id ? data : t))
+            }
+            setMetricsRefresh(n => n + 1)
+            break
+          case 'task:deleted':
             setTasks(prev => prev.filter(t => t.id !== data.id))
-          } else {
-            setTasks(prev => prev.map(t => t.id === data.id ? data : t))
-          }
-          setMetricsRefresh(n => n + 1)
-          break
-        case 'task:deleted':
-          setTasks(prev => prev.filter(t => t.id !== data.id))
-          setMetricsRefresh(n => n + 1)
-          break
-        case 'tasks:reordered':
-          setTasks(data.filter((t: Task) => !t.archived))
-          setMetricsRefresh(n => n + 1)
-          break
+            setMetricsRefresh(n => n + 1)
+            break
+          case 'tasks:reordered':
+            setTasks(data.filter((t: Task) => !t.archived))
+            setMetricsRefresh(n => n + 1)
+            break
+        }
+      }
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error)
       }
     }
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error)
-    }
+    connect()
 
     return () => {
-      ws.close()
+      isCleaningUp = true
+      if (reconnectTimeout) clearTimeout(reconnectTimeout)
+      if (ws) ws.close()
     }
-  }, [])
+  }, [fetchTasks])
 
   // Get unique tags from all tasks
   const allTags = useMemo(() => {
