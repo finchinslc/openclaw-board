@@ -1,39 +1,10 @@
 services:
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: openclaw
-      POSTGRES_PASSWORD: openclaw
-      POSTGRES_DB: openclaw
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U openclaw"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  migrate:
-    build: .
-    environment:
-      DATABASE_URL: postgresql://openclaw:openclaw@db:5432/openclaw?schema=public
-    depends_on:
-      db:
-        condition: service_healthy
-    command: ["./node_modules/.bin/prisma", "migrate", "deploy"]
-    user: root
-
   app:
     build: .
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://openclaw:openclaw@db:5432/openclaw?schema=public
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
-
-volumes:
-  postgres_data:
+      DATABASE_URL: postgresql://alexinslc@host.docker.internal:5432/openclaw?schema=public
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

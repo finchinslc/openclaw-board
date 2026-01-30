@@ -106,12 +106,12 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
             
             <div>
               <label className="text-sm font-medium">Story Points</label>
-              <Select value={storyPoints} onValueChange={setStoryPoints}>
+              <Select value={storyPoints || "none"} onValueChange={(v) => setStoryPoints(v === "none" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="—" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="1">1</SelectItem>
                   <SelectItem value="2">2</SelectItem>
                   <SelectItem value="3">3</SelectItem>
