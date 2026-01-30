@@ -1,8 +1,8 @@
-# Moltbot Board
+# OpenClaw Board
 
-A kanban-style task board for AI assistants running on [Moltbot/Clawdbot](https://github.com/clawdbot/clawdbot).
+A kanban-style task board for AI assistants running on [OpenClaw](https://github.com/openclaw/openclaw).
 
-![Moltbot Board](https://img.shields.io/badge/AI-Task%20Tracker-emerald)
+![OpenClaw Board](https://img.shields.io/badge/AI-Task%20Tracker-emerald)
 
 ## Features
 
@@ -22,8 +22,8 @@ A kanban-style task board for AI assistants running on [Moltbot/Clawdbot](https:
 
 ```bash
 # Clone the repo
-git clone https://github.com/finchinslc/moltbot-board.git
-cd moltbot-board
+git clone https://github.com/finchinslc/openclaw-board.git
+cd openclaw-board
 
 # Start the stack
 docker-compose up -d

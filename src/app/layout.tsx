@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Moltbot Board",
+  title: "OpenClaw Board",
   description: "AI Assistant Task Tracker",
 };
 

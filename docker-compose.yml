@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: moltbot
-      POSTGRES_PASSWORD: moltbot
-      POSTGRES_DB: moltbot
+      POSTGRES_USER: openclaw
+      POSTGRES_PASSWORD: openclaw
+      POSTGRES_DB: openclaw
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U moltbot"]
+      test: ["CMD-SHELL", "pg_isready -U openclaw"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -17,7 +17,7 @@ services:
   migrate:
     build: .
     environment:
-      DATABASE_URL: postgresql://moltbot:moltbot@db:5432/moltbot?schema=public
+      DATABASE_URL: postgresql://openclaw:openclaw@db:5432/openclaw?schema=public
     depends_on:
       db:
         condition: service_healthy
@@ -30,7 +30,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://moltbot:moltbot@db:5432/moltbot?schema=public
+      DATABASE_URL: postgresql://openclaw:openclaw@db:5432/openclaw?schema=public
     depends_on:
       migrate:
         condition: service_completed_successfully

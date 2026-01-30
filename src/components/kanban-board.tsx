@@ -197,7 +197,7 @@ export function KanbanBoard() {
             <Bot className={cn("h-7 w-7 relative", isWorking && "animate-pulse")} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Moltbot Board</h1>
+            <h1 className="text-2xl font-bold">OpenClaw Board</h1>
             <p className="text-sm text-muted-foreground">
               {isWorking ? (
                 <span className="text-primary font-medium">Working on a task...</span>
