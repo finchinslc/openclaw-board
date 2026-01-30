@@ -80,7 +80,7 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
               <div className="flex-1 min-w-0">
                 {/* Task key + title */}
                 <div className="flex items-start gap-1.5">
-                  <span className="text-[10px] font-mono text-muted-foreground shrink-0 pt-0.5">
+                  <span className="text-xs font-mono text-muted-foreground shrink-0 pt-0.5">
                     OCB-{task.taskNumber}
                   </span>
                   <h3 className="font-medium text-sm leading-tight line-clamp-2">
@@ -92,48 +92,48 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                   {/* Priority dot */}
                   <div 
-                    className={cn('w-2 h-2 rounded-full', priorityColors[task.priority])}
+                    className={cn('w-2.5 h-2.5 rounded-full', priorityColors[task.priority])}
                     title={`${task.priority} priority`}
                   />
                   
                   {/* Story points */}
                   {task.storyPoints && (
-                    <span className="text-[10px] text-blue-500 font-medium">
+                    <span className="text-xs text-blue-500 font-medium">
                       {task.storyPoints}pt
                     </span>
                   )}
                   
                   {/* Tags (show first 2 max) */}
                   {task.tags.slice(0, 2).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[10px] px-1 py-0 h-4">
+                    <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 h-5">
                       {tag}
                     </Badge>
                   ))}
                   {task.tags.length > 2 && (
-                    <span className="text-[10px] text-muted-foreground">+{task.tags.length - 2}</span>
+                    <span className="text-xs text-muted-foreground">+{task.tags.length - 2}</span>
                   )}
                   
                   {/* Indicators */}
-                  <div className="flex items-center gap-1.5 ml-auto text-muted-foreground">
+                  <div className="flex items-center gap-2 ml-auto text-muted-foreground">
                     {hasDeps && (
                       <span className="text-amber-500" title={blockReason || 'Has dependencies'}>
-                        <Link className="h-3 w-3" />
+                        <Link className="h-3.5 w-3.5" />
                       </span>
                     )}
                     {hasSubtasks && (
-                      <span className="flex items-center text-[10px]" title="Subtasks">
-                        <ListChecks className="h-3 w-3 mr-0.5" />
+                      <span className="flex items-center text-xs" title="Subtasks">
+                        <ListChecks className="h-3.5 w-3.5 mr-0.5" />
                         {task.subtasks?.filter(s => s.completed).length}/{task.subtasks?.length}
                       </span>
                     )}
                     {hasComments && (
-                      <span className="flex items-center text-[10px]" title="Comments">
-                        <MessageSquare className="h-3 w-3 mr-0.5" />
+                      <span className="flex items-center text-xs" title="Comments">
+                        <MessageSquare className="h-3.5 w-3.5 mr-0.5" />
                         {task.comments?.length}
                       </span>
                     )}
                     {hasAttachments && (
-                      <span className="text-[10px]" title="Attachments">
+                      <span className="text-xs" title="Attachments">
                         📎{task.attachments?.length}
                       </span>
                     )}
