@@ -26,6 +26,7 @@ export interface Task {
   storyPoints: number | null
   archived: boolean
   archivedAt: string | null
+  blockedReason: string | null
   startedAt: string | null
   reviewedAt: string | null
   completedAt: string | null

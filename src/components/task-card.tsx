@@ -31,9 +31,12 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
     })
   }
 
-  // Check if blocked by incomplete dependencies
+  // Check if blocked by incomplete dependencies OR manual blocker
   const incompleteDeps = task.blockedBy?.filter(dep => dep.status !== 'DONE') || []
-  const isBlocked = incompleteDeps.length > 0
+  const isBlocked = incompleteDeps.length > 0 || !!task.blockedReason
+  const blockReason = task.blockedReason || (incompleteDeps.length > 0 
+    ? `Blocked by: ${incompleteDeps.map(d => d.title).join(', ')}`
+    : null)
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -55,7 +58,7 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
             {/* Blocked indicator */}
             {isBlocked && (
               <div className="absolute -top-2 -left-2 z-10">
-                <div className="bg-amber-500 text-white rounded-full p-1.5" title={`Blocked by: ${incompleteDeps.map(d => d.title).join(', ')}`}>
+                <div className="bg-amber-500 text-white rounded-full p-1.5" title={blockReason || 'Blocked'}>
                   <AlertCircle className="h-4 w-4" />
                 </div>
               </div>
@@ -136,6 +139,14 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
                 <div className="flex items-center gap-1 text-xs text-amber-600 mb-2">
                   <Link className="h-3 w-3" />
                   <span>Depends on {task.blockedBy?.length} task{task.blockedBy?.length === 1 ? '' : 's'}</span>
+                </div>
+              )}
+              
+              {/* Manual blocker indicator */}
+              {task.blockedReason && (
+                <div className="flex items-center gap-1 text-xs text-amber-600 mb-2">
+                  <AlertCircle className="h-3 w-3" />
+                  <span className="truncate">{task.blockedReason}</span>
                 </div>
               )}
               

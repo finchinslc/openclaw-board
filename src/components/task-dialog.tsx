@@ -42,6 +42,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
   const [subtasks, setSubtasks] = useState<Subtask[]>([])
   const [isSubmittingSubtask, setIsSubmittingSubtask] = useState(false)
   const [blockedBy, setBlockedBy] = useState<string[]>([])
+  const [blockedReason, setBlockedReason] = useState('')
 
   useEffect(() => {
     if (task) {
@@ -53,6 +54,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       setComments(task.comments || [])
       setSubtasks(task.subtasks || [])
       setBlockedBy(task.blockedBy?.map(t => t.id) || [])
+      setBlockedReason(task.blockedReason || '')
     } else {
       setTitle('')
       setDescription('')
@@ -62,6 +64,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       setComments([])
       setSubtasks([])
       setBlockedBy([])
+      setBlockedReason('')
     }
     setNewComment('')
     setNewSubtask('')
@@ -77,6 +80,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       storyPoints: storyPoints ? parseInt(storyPoints, 10) : null,
       blockedBy: blockedBy as unknown as Task[], // Will be converted to IDs in API
+      blockedReason: blockedReason || null,
     })
     onOpenChange(false)
   }
@@ -245,15 +249,27 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
             />
           </div>
 
-          {/* Dependencies Section */}
+          {/* Dependencies & Blockers Section */}
           {task && (
             <div className="border-t pt-4 mt-4">
               <label className="text-sm font-medium flex items-center gap-2 mb-3">
                 <Link className="h-4 w-4" />
-                Dependencies ({blockedBy.length})
+                Dependencies & Blockers
               </label>
               
-              <div className="space-y-2">
+              {/* Manual Blocker */}
+              <div className="mb-4">
+                <label className="text-xs text-muted-foreground mb-1 block">Manual Blocker (e.g., "Waiting on API access")</label>
+                <Input
+                  value={blockedReason}
+                  onChange={(e) => setBlockedReason(e.target.value)}
+                  placeholder="Leave empty if not blocked"
+                />
+              </div>
+              
+              {/* Task Dependencies */}
+              <label className="text-xs text-muted-foreground mb-2 block">Depends on tasks ({blockedBy.length})</label>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
                 {allTasks
                   .filter(t => t.id !== task.id && !t.archived)
                   .map((t) => (

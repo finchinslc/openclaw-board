@@ -32,6 +32,7 @@ model Task {
   storyPoints   Int?
   archived      Boolean    @default(false)
   archivedAt    DateTime?
+  blockedReason String?    // Manual blocker reason (e.g., "Waiting on API access")
   startedAt     DateTime?  // When moved to IN_PROGRESS
   reviewedAt    DateTime?  // When moved to NEEDS_REVIEW
   completedAt   DateTime?  // When moved to DONE
