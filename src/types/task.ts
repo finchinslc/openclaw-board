@@ -42,6 +42,7 @@ export interface Task {
   description: string | null
   status: 'TODO' | 'IN_PROGRESS' | 'NEEDS_REVIEW' | 'DONE'
   priority: 'LOW' | 'MEDIUM' | 'HIGH'
+  origin: 'HUMAN' | 'AI'
   tags: string[]
   position: number
   isActive: boolean
@@ -64,6 +65,7 @@ export interface Task {
 
 export type TaskStatus = Task['status']
 export type Priority = Task['priority']
+export type TaskOrigin = Task['origin']
 
 export interface Column {
   id: TaskStatus

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { title, description, priority, tags } = body
+    const { title, description, priority, origin, tags } = body
 
     // Get max position for TODO column
     const maxPosition = await prisma.task.aggregate({
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
         title,
         description,
         priority: priority || 'MEDIUM',
+        origin: origin || 'HUMAN',
         tags: tags || [],
         position: (maxPosition._max.position ?? -1) + 1,
       },

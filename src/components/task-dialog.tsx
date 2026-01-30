@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Task, Priority, Comment, Subtask, Attachment, Activity } from '@/types/task'
+import { Task, Priority, TaskOrigin, Comment, Subtask, Attachment, Activity } from '@/types/task'
 import { Code, ExternalLink, FileText, History, Link, MessageSquare, Paperclip, Send, ListChecks, Plus, X } from 'lucide-react'
 
 interface TaskDialogProps {
@@ -33,6 +33,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<Priority>('MEDIUM')
+  const [origin, setOrigin] = useState<TaskOrigin>('HUMAN')
   const [tags, setTags] = useState('')
   const [storyPoints, setStoryPoints] = useState<string>('')
   const [newComment, setNewComment] = useState('')
@@ -53,6 +54,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       setTitle(task.title)
       setDescription(task.description || '')
       setPriority(task.priority)
+      setOrigin(task.origin || 'HUMAN')
       setTags(task.tags.join(', '))
       setStoryPoints(task.storyPoints?.toString() || '')
       setComments(task.comments || [])
@@ -65,6 +67,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       setTitle('')
       setDescription('')
       setPriority('MEDIUM')
+      setOrigin('HUMAN')
       setTags('')
       setStoryPoints('')
       setComments([])
@@ -85,6 +88,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
       title,
       description: description || null,
       priority,
+      origin,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       storyPoints: storyPoints ? parseInt(storyPoints, 10) : null,
       blockedBy: blockedBy as unknown as Task[], // Will be converted to IDs in API
@@ -264,7 +268,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium">Priority</label>
               <Select value={priority} onValueChange={(v) => setPriority(v as Priority)}>
@@ -293,6 +297,19 @@ export function TaskDialog({ open, onOpenChange, task, onSave, allTasks = [] }: 
                   <SelectItem value="5">5</SelectItem>
                   <SelectItem value="8">8</SelectItem>
                   <SelectItem value="13">13</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Origin</label>
+              <Select value={origin} onValueChange={(v) => setOrigin(v as TaskOrigin)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="HUMAN">Human</SelectItem>
+                  <SelectItem value="AI">AI</SelectItem>
                 </SelectContent>
               </Select>
             </div>

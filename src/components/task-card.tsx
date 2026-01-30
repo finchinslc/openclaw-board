@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Task } from '@/types/task'
 import { Draggable } from '@hello-pangea/dnd'
-import { AlertCircle, Bot, Check, Link, ListChecks, MessageSquare, Pencil, RotateCcw, Trash2 } from 'lucide-react'
+import { AlertCircle, Bot, Check, Link, ListChecks, MessageSquare, Pencil, RotateCcw, Sparkles, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -83,6 +83,11 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
                   <span className="text-xs font-mono text-muted-foreground shrink-0 pt-0.5">
                     OCB-{task.taskNumber}
                   </span>
+                  {task.origin === 'AI' && (
+                    <span className="text-purple-500 shrink-0 pt-0.5" title="AI-suggested task">
+                      <Sparkles className="h-3 w-3" />
+                    </span>
+                  )}
                   <h3 className="font-medium text-sm leading-tight line-clamp-2">
                     {task.title}
                   </h3>

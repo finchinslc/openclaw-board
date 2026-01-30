@@ -19,6 +19,11 @@ enum Priority {
   HIGH
 }
 
+enum TaskOrigin {
+  HUMAN
+  AI
+}
+
 model Task {
   id            String     @id @default(cuid())
   taskNumber    Int        @unique @default(autoincrement())
@@ -26,6 +31,7 @@ model Task {
   description   String?
   status        TaskStatus @default(TODO)
   priority      Priority   @default(MEDIUM)
+  origin        TaskOrigin @default(HUMAN)
   tags          String[]
   position      Int        @default(0)
   isActive      Boolean    @default(false)
