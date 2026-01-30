@@ -1,12 +1,20 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { DragDropContext, DropResult } from '@hello-pangea/dnd'
-import { Task, TaskStatus } from '@/types/task'
+import { Task, TaskStatus, Priority } from '@/types/task'
 import { KanbanColumn } from './kanban-column'
 import { TaskDialog } from './task-dialog'
 import { Button } from '@/components/ui/button'
-import { Bot, Plus, WifiOff } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Bot, Plus, WifiOff, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { MetricsPanel } from './metrics-panel'
 
@@ -23,6 +31,11 @@ export function KanbanBoard() {
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [metricsRefresh, setMetricsRefresh] = useState(0)
+  
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'ALL'>('ALL')
+  const [tagFilter, setTagFilter] = useState<string>('ALL')
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -86,8 +99,48 @@ export function KanbanBoard() {
     }
   }, [])
 
+  // Get unique tags from all tasks
+  const allTags = useMemo(() => {
+    const tags = new Set<string>()
+    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
+    return Array.from(tags).sort()
+  }, [tasks])
+
+  // Filter tasks
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        const matchesTitle = task.title.toLowerCase().includes(query)
+        const matchesDescription = task.description?.toLowerCase().includes(query)
+        if (!matchesTitle && !matchesDescription) return false
+      }
+      
+      // Priority filter
+      if (priorityFilter !== 'ALL' && task.priority !== priorityFilter) {
+        return false
+      }
+      
+      // Tag filter
+      if (tagFilter !== 'ALL' && !task.tags.includes(tagFilter)) {
+        return false
+      }
+      
+      return true
+    })
+  }, [tasks, searchQuery, priorityFilter, tagFilter])
+
+  const hasActiveFilters = searchQuery || priorityFilter !== 'ALL' || tagFilter !== 'ALL'
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setPriorityFilter('ALL')
+    setTagFilter('ALL')
+  }
+
   const getColumnTasks = (status: TaskStatus) => {
-    return tasks
+    return filteredTasks
       .filter(task => task.status === status)
       .sort((a, b) => a.position - b.position)
   }
@@ -237,6 +290,58 @@ export function KanbanBoard() {
 
       {/* Metrics Panel */}
       <MetricsPanel refreshTrigger={metricsRefresh} />
+
+      {/* Search & Filter Bar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        
+        <Select value={priorityFilter} onValueChange={(v) => setPriorityFilter(v as Priority | 'ALL')}>
+          <SelectTrigger className="w-[130px]">
+            <SelectValue placeholder="Priority" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Priorities</SelectItem>
+            <SelectItem value="HIGH">High</SelectItem>
+            <SelectItem value="MEDIUM">Medium</SelectItem>
+            <SelectItem value="LOW">Low</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {allTags.length > 0 && (
+          <Select value={tagFilter} onValueChange={setTagFilter}>
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Tag" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Tags</SelectItem>
+              {allTags.map(tag => (
+                <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <X className="h-4 w-4 mr-1" />
+            Clear
+          </Button>
+        )}
+        
+        {hasActiveFilters && (
+          <span className="text-sm text-muted-foreground">
+            Showing {filteredTasks.length} of {tasks.length} tasks
+          </span>
+        )}
+      </div>
 
       {/* Active Task Banner */}
       {activeTask && (
