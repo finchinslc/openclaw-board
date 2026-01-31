@@ -148,10 +148,20 @@ export function KanbanBoard() {
     return tasks.filter(task => {
       // Search filter
       if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        const matchesTitle = task.title.toLowerCase().includes(query)
-        const matchesDescription = task.description?.toLowerCase().includes(query)
-        if (!matchesTitle && !matchesDescription) return false
+        const query = searchQuery.toLowerCase().trim()
+        
+        // Check for task number search (e.g., "OCB-37", "37", "#37")
+        const taskNumMatch = query.match(/^(?:ocb-?|#)?(\d+)$/i)
+        if (taskNumMatch) {
+          const searchNum = parseInt(taskNumMatch[1], 10)
+          if (task.taskNumber !== searchNum) return false
+        } else {
+          // Regular text search
+          const matchesTitle = task.title.toLowerCase().includes(query)
+          const matchesDescription = task.description?.toLowerCase().includes(query)
+          const matchesTags = task.tags.some(tag => tag.toLowerCase().includes(query))
+          if (!matchesTitle && !matchesDescription && !matchesTags) return false
+        }
       }
       
       // Priority filter
@@ -362,7 +372,7 @@ export function KanbanBoard() {
         <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search tasks..."
+            placeholder="Search tasks or OCB-##..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 h-9 sm:h-10"
