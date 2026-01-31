@@ -227,35 +227,37 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] sm:max-h-[85vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-base sm:text-lg">
             {task ? (
               <>
-                <span className="font-mono text-muted-foreground mr-2">OCB-{task.taskNumber}</span>
+                <span className="font-mono text-muted-foreground mr-2 text-sm">OCB-{task.taskNumber}</span>
                 Edit Task
               </>
             ) : 'New Task'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-xs sm:text-sm font-medium">Title</label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
               required
+              className="h-9 sm:h-10"
             />
           </div>
           
           <div>
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-xs sm:text-sm font-medium">Description</label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Task description (optional)"
               rows={3}
+              className="text-sm"
             />
           </div>
           

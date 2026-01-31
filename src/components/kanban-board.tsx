@@ -293,13 +293,13 @@ export function KanbanBoard() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex items-center gap-3">
           {/* Agent Icon */}
           <div className={cn(
-            "relative p-2.5 rounded-xl transition-all",
+            "relative p-2 sm:p-2.5 rounded-xl transition-all shrink-0",
             isWorking 
               ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" 
               : "bg-primary/10 text-primary"
@@ -307,11 +307,11 @@ export function KanbanBoard() {
             {isWorking && (
               <div className="absolute inset-0 rounded-xl bg-primary animate-ping opacity-30" />
             )}
-            <Bot className={cn("h-7 w-7 relative", isWorking && "animate-pulse")} />
+            <Bot className={cn("h-6 w-6 sm:h-7 sm:w-7 relative", isWorking && "animate-pulse")} />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">OpenClaw Board</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">OpenClaw Board</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
               {isWorking ? (
                 <span className="text-primary font-medium">Working on a task...</span>
               ) : (
@@ -321,9 +321,9 @@ export function KanbanBoard() {
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className={cn(
-            "flex items-center gap-2 text-sm px-3 py-1.5 rounded-full",
+            "flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 rounded-full",
             isConnected ? "bg-primary/10" : "bg-muted"
           )}>
             {isConnected ? (
@@ -336,18 +336,18 @@ export function KanbanBoard() {
               </>
             ) : (
               <>
-                <WifiOff className="h-3.5 w-3.5 text-muted-foreground" />
+                <WifiOff className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
                 <span className="text-muted-foreground">Offline</span>
               </>
             )}
           </div>
-          <Button onClick={handleNewTask}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Task
+          <Button size="sm" onClick={handleNewTask}>
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">New Task</span>
           </Button>
-          <Button variant="outline" onClick={() => setIsArchiveOpen(true)}>
-            <Archive className="h-4 w-4 mr-2" />
-            Archive
+          <Button variant="outline" size="sm" onClick={() => setIsArchiveOpen(true)}>
+            <Archive className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Archive</span>
           </Button>
         </div>
       </div>
@@ -356,19 +356,19 @@ export function KanbanBoard() {
       <MetricsPanel refreshTrigger={metricsRefresh} />
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-9 h-9 sm:h-10"
           />
         </div>
         
         <Select value={priorityFilter} onValueChange={(v) => setPriorityFilter(v as Priority | 'ALL')}>
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-[110px] sm:w-[130px] h-9 sm:h-10 text-xs sm:text-sm">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
@@ -381,7 +381,7 @@ export function KanbanBoard() {
         
         {allTags.length > 0 && (
           <Select value={tagFilter} onValueChange={setTagFilter}>
-            <SelectTrigger className="w-[130px]">
+            <SelectTrigger className="w-[100px] sm:w-[130px] h-9 sm:h-10 text-xs sm:text-sm">
               <SelectValue placeholder="Tag" />
             </SelectTrigger>
             <SelectContent>
@@ -395,13 +395,13 @@ export function KanbanBoard() {
         
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            <X className="h-4 w-4 mr-1" />
-            Clear
+            <X className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Clear</span>
           </Button>
         )}
         
         {hasActiveFilters && (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">
             Showing {filteredTasks.length} of {tasks.length} tasks
           </span>
         )}
@@ -409,25 +409,25 @@ export function KanbanBoard() {
 
       {/* Active Task Banner */}
       {activeTask && (
-        <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-3">
-          <div className="relative">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2 sm:gap-3">
+          <div className="relative shrink-0">
             <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-50" />
-            <div className="relative bg-primary text-primary-foreground rounded-full p-2">
-              <Bot className="h-5 w-5" />
+            <div className="relative bg-primary text-primary-foreground rounded-full p-1.5 sm:p-2">
+              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-primary">
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-primary">
               Currently Working On
             </p>
-            <p className="font-semibold">{activeTask.title}</p>
+            <p className="font-semibold text-sm sm:text-base truncate">{activeTask.title}</p>
           </div>
         </div>
       )}
 
       {/* Kanban Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {COLUMNS.map(column => (
             <KanbanColumn
               key={column.id}

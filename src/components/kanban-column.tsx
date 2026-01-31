@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Droppable } from '@hello-pangea/dnd'
 import { Task, TaskStatus } from '@/types/task'
 import { TaskCard } from './task-card'
 import { cn } from '@/lib/utils'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
 interface KanbanColumnProps {
   id: TaskStatus
@@ -23,28 +25,39 @@ const columnStyles: Record<TaskStatus, string> = {
 }
 
 export function KanbanColumn({ id, title, tasks, onEditTask, onDeleteTask, onApproveTask, onRejectTask }: KanbanColumnProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   return (
     <div className={cn(
-      'bg-muted/50 rounded-lg border-t-4 min-h-[500px] flex flex-col',
+      'bg-muted/50 rounded-lg border-t-4 flex flex-col',
+      'min-h-[200px] sm:min-h-[400px] md:min-h-[500px]',
       columnStyles[id]
     )}>
-      <div className="p-4 border-b bg-background/50 rounded-t-lg">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">{title}</h2>
-          <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded-full">
-            {tasks.length}
+      <button 
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full p-3 sm:p-4 border-b bg-background/50 rounded-t-lg flex items-center justify-between hover:bg-background/70 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="md:hidden text-muted-foreground">
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </span>
+          <h2 className="font-semibold text-base sm:text-lg">{title}</h2>
         </div>
-      </div>
+        <span className="text-xs sm:text-sm text-muted-foreground bg-muted px-2 py-0.5 sm:py-1 rounded-full">
+          {tasks.length}
+        </span>
+      </button>
       
+      {/* On mobile, allow collapse. On desktop (md+), always show */}
       <Droppable droppableId={id}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={cn(
-              'flex-1 p-3 transition-colors min-h-[200px]',
-              snapshot.isDraggingOver && 'bg-muted'
+              'flex-1 p-2 sm:p-3 transition-colors',
+              snapshot.isDraggingOver && 'bg-muted',
+              isCollapsed && 'hidden md:block'
             )}
           >
             {tasks.map((task, index) => (

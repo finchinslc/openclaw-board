@@ -44,11 +44,11 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="mb-2 cursor-grab active:cursor-grabbing"
+          className="mb-2 sm:mb-2 cursor-grab active:cursor-grabbing touch-manipulation"
         >
           <Card
             className={cn(
-              'relative transition-all duration-200 hover:shadow-md p-2',
+              'relative transition-all duration-200 hover:shadow-md p-2 sm:p-2',
               snapshot.isDragging && 'rotate-2 shadow-xl',
               task.isActive && 'ring-2 ring-primary',
               isBlocked && 'opacity-60 border-dashed border-amber-500'
@@ -146,29 +146,29 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
                 </div>
               </div>
               
-              {/* Action buttons */}
+              {/* Action buttons - larger touch targets on mobile */}
               <div className="flex gap-0.5 shrink-0">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6"
+                  className="h-7 w-7 sm:h-6 sm:w-6"
                   onClick={(e) => {
                     e.stopPropagation()
                     onEdit(task)
                   }}
                 >
-                  <Pencil className="h-3 w-3" />
+                  <Pencil className="h-3.5 w-3.5 sm:h-3 sm:w-3" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 text-destructive hover:text-destructive"
+                  className="h-7 w-7 sm:h-6 sm:w-6 text-destructive hover:text-destructive"
                   onClick={(e) => {
                     e.stopPropagation()
                     onDelete(task.id)
                   }}
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-3.5 w-3.5 sm:h-3 sm:w-3" />
                 </Button>
               </div>
             </div>
@@ -178,25 +178,25 @@ export function TaskCard({ task, index, onEdit, onDelete, onApprove, onReject }:
               <div className="flex gap-2 mt-2 pt-2 border-t">
                 <Button
                   size="sm"
-                  className="flex-1 h-7 text-xs bg-emerald-600 hover:bg-emerald-700"
+                  className="flex-1 h-8 sm:h-7 text-xs bg-emerald-600 hover:bg-emerald-700"
                   onClick={(e) => {
                     e.stopPropagation()
                     onApprove(task.id)
                   }}
                 >
-                  <Check className="h-3 w-3 mr-1" />
+                  <Check className="h-3.5 w-3.5 sm:h-3 sm:w-3 mr-1" />
                   Approve
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1 h-7 text-xs"
+                  className="flex-1 h-8 sm:h-7 text-xs"
                   onClick={(e) => {
                     e.stopPropagation()
                     onReject(task.id)
                   }}
                 >
-                  <RotateCcw className="h-3 w-3 mr-1" />
+                  <RotateCcw className="h-3.5 w-3.5 sm:h-3 sm:w-3 mr-1" />
                   Revise
                 </Button>
               </div>
