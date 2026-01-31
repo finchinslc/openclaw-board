@@ -21,12 +21,11 @@ export async function GET(request: NextRequest) {
       } : undefined
     })
     
-    // Get completed tasks for velocity
+    // Get completed tasks for velocity (include archived - they still count!)
     const completedLast30Days = await prisma.task.findMany({
       where: {
         status: 'DONE',
-        completedAt: { gte: since },
-        archived: false
+        completedAt: { gte: since }
       },
       include: {
         statusHistory: { orderBy: { enteredAt: 'asc' } }
