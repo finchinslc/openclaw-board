@@ -6,6 +6,7 @@ import { Task, TaskStatus, Priority } from '@/types/task'
 import { KanbanColumn } from './kanban-column'
 import { TaskDialog } from './task-dialog'
 import { ArchivePanel } from './archive-panel'
+import { ThemeToggle } from './theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -349,6 +350,7 @@ export function KanbanBoard() {
             <Archive className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Archive</span>
           </Button>
+          <ThemeToggle />
         </div>
       </div>
 

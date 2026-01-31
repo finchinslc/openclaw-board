@@ -12,7 +12,7 @@ export function Markdown({ children, className }: MarkdownProps) {
   return (
     <div
       className={cn(
-        'prose prose-sm prose-invert max-w-none',
+        'prose prose-sm dark:prose-invert max-w-none',
         // Headings
         'prose-headings:font-semibold prose-headings:text-foreground',
         'prose-h1:text-lg prose-h2:text-base prose-h3:text-sm',
