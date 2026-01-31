@@ -4,8 +4,6 @@
 
 A kanban-style task board for human-AI collaboration, built for [OpenClaw](https://github.com/openclaw/openclaw).
 
-![OpenClaw Board](docs/screenshot.png)
-
 ## Features
 
 - 🎯 **Drag-and-drop kanban** — TODO → In Progress → Needs Review → Done
@@ -18,7 +16,7 @@ A kanban-style task board for human-AI collaboration, built for [OpenClaw](https
 - 🏷️ **Human-readable IDs** — Jira-style keys (OCB-1, OCB-2, etc.)
 - 🖥️ **CLI included** — `ocb` command for terminal-based task management
 
-![Task Dialog](docs/images/task-dialog.jpg)
+![OpenClaw Board](docs/screenshot.png)
 
 ## Quick Start
 
