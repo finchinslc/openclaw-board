@@ -86,6 +86,43 @@ export async function PATCH(
       if (currentTask.status === 'NEEDS_REVIEW' && body.status !== 'NEEDS_REVIEW') {
         updateData.reviewedAt = null
       }
+      
+      // Track status history
+      const now = new Date()
+      
+      // Close out the previous status entry
+      await prisma.statusHistory.updateMany({
+        where: { taskId: id, exitedAt: null },
+        data: { 
+          exitedAt: now,
+          duration: {
+            // Calculate duration - will be handled in a moment
+          }
+        }
+      })
+      
+      // Actually, let's do this properly with a query
+      const previousEntry = await prisma.statusHistory.findFirst({
+        where: { taskId: id, exitedAt: null },
+        orderBy: { enteredAt: 'desc' }
+      })
+      
+      if (previousEntry) {
+        const duration = Math.floor((now.getTime() - previousEntry.enteredAt.getTime()) / 1000)
+        await prisma.statusHistory.update({
+          where: { id: previousEntry.id },
+          data: { exitedAt: now, duration }
+        })
+      }
+      
+      // Create new status entry
+      await prisma.statusHistory.create({
+        data: {
+          taskId: id,
+          status: body.status,
+          enteredAt: now
+        }
+      })
     }
     
     // Build the update with blockedBy relation if provided

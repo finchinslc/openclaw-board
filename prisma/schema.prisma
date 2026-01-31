@@ -48,6 +48,7 @@ model Task {
   subtasks      Subtask[]
   attachments   Attachment[]
   activities    Activity[]
+  statusHistory StatusHistory[]
   // Dependencies: tasks this task is blocked by
   blockedBy     Task[]     @relation("TaskDependencies")
   // Reverse: tasks that depend on this task
@@ -93,4 +94,16 @@ model Activity {
   taskId    String
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+}
+
+model StatusHistory {
+  id        String     @id @default(cuid())
+  status    TaskStatus
+  enteredAt DateTime   @default(now())
+  exitedAt  DateTime?
+  duration  Int?       // Duration in seconds (calculated when exiting)
+  taskId    String
+  task      Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  @@index([taskId, enteredAt])
 }

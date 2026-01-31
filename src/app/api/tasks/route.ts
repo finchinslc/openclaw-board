@@ -54,6 +54,15 @@ export async function POST(request: Request) {
       },
     })
 
+    // Initialize status history with TODO
+    await prisma.statusHistory.create({
+      data: {
+        taskId: task.id,
+        status: 'TODO',
+        enteredAt: task.createdAt
+      }
+    })
+
     // Log creation
     await logActivity(task.id, 'created', body.actor || 'human')
 

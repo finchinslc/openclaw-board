@@ -25,6 +25,15 @@ export interface Activity {
   createdAt: string
 }
 
+export interface StatusHistoryEntry {
+  id: string
+  status: 'TODO' | 'IN_PROGRESS' | 'NEEDS_REVIEW' | 'DONE'
+  enteredAt: string
+  exitedAt: string | null
+  duration: number | null  // seconds
+  taskId: string
+}
+
 export interface Attachment {
   id: string
   type: 'link' | 'code' | 'note' | 'file'
