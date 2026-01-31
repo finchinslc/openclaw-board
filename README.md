@@ -4,7 +4,7 @@
 
 A kanban-style task board for human-AI collaboration, built for [OpenClaw](https://github.com/openclaw/openclaw).
 
-![OpenClaw Board](docs/images/board-overview.jpg)
+![OpenClaw Board](docs/screenshot.png)
 
 ## Features
 
@@ -16,6 +16,7 @@ A kanban-style task board for human-AI collaboration, built for [OpenClaw](https
 - 📎 **Attachments** — Links, code snippets, and notes on tasks
 - 💬 **Comments & subtasks** — Break down work and discuss
 - 🏷️ **Human-readable IDs** — Jira-style keys (OCB-1, OCB-2, etc.)
+- 🖥️ **CLI included** — `ocb` command for terminal-based task management
 
 ![Task Dialog](docs/images/task-dialog.jpg)
 
@@ -82,6 +83,47 @@ Open http://localhost:3000
 ```bash
 # .env
 DATABASE_URL="postgresql://user@localhost:5432/openclaw?schema=public"
+```
+
+## CLI
+
+The board includes a command-line interface (`ocb`) — automatically installed with the TUI installer, or manually via:
+
+```bash
+cd openclaw-board/cli
+npm install && npm link
+```
+
+### Commands
+
+```bash
+ocb list                      # List all tasks
+ocb todo                      # Show TODO tasks
+ocb show OCB-42               # Task details
+ocb create "Fix bug"          # Create task
+ocb start 42                  # Start working (sets active)
+ocb done 42                   # Mark complete
+ocb review 42                 # Submit for review
+ocb pick                      # Grab next TODO
+ocb active                    # Show current task
+ocb comment 42 "Note"         # Add comment
+```
+
+### Options
+
+```bash
+ocb list --status IN_PROGRESS # Filter by status
+ocb list --priority HIGH      # Filter by priority
+ocb list --tag bug            # Filter by tag
+ocb create "Task" --priority HIGH --tags feature,urgent
+ocb pick --priority           # Pick highest priority
+ocb show 42 --json            # JSON output
+```
+
+### Configuration
+
+```bash
+export OCB_API_URL=http://localhost:3000/api  # Default
 ```
 
 ## API
