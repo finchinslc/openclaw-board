@@ -125,6 +125,49 @@ curl -X PATCH http://localhost:3000/api/tasks/<id> \
 Connect to `/ws` for real-time events:
 - `task:created`, `task:updated`, `task:deleted`, `tasks:reordered`
 
+### Webhooks
+
+Send task events to external services (Slack, Discord, etc.) via HTTP POST.
+
+**Configuration (environment variables):**
+```bash
+WEBHOOK_URL=https://your-endpoint.com/hook
+WEBHOOK_SECRET=your-secret            # Optional: for signature verification
+WEBHOOK_EVENTS=task.created,task.deleted  # Optional: filter events (empty = all)
+```
+
+**Events:**
+- `task.created` - New task created
+- `task.updated` - Task fields changed (includes `changes` array)
+- `task.status_changed` - Task moved between columns
+- `task.deleted` - Task deleted
+
+**Payload:**
+```json
+{
+  "event": "task.status_changed",
+  "timestamp": "2026-01-30T12:00:00.000Z",
+  "task": {
+    "id": "abc123",
+    "taskNumber": 42,
+    "title": "Build feature",
+    "status": "DONE",
+    "priority": "HIGH",
+    ...
+  },
+  "changes": [
+    { "field": "status", "oldValue": "IN_PROGRESS", "newValue": "DONE" }
+  ]
+}
+```
+
+**Headers:**
+- `X-OpenClaw-Event`: Event type
+- `X-OpenClaw-Delivery`: Unique delivery ID
+- `X-OpenClaw-Signature`: HMAC-SHA256 signature (if secret configured)
+
+**Multiple webhooks:** Use `WEBHOOK_URL_1`, `WEBHOOK_SECRET_1`, `WEBHOOK_EVENTS_1`, etc. (up to 5).
+
 ## Tech Stack
 
 Next.js · Prisma · PostgreSQL · shadcn/ui · @hello-pangea/dnd

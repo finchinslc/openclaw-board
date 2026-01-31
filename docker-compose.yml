@@ -6,5 +6,10 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://alexinslc@host.docker.internal:5432/openclaw?schema=public
+      # Webhook configuration (optional)
+      # WEBHOOK_URL: https://your-webhook-endpoint.com/hook
+      # WEBHOOK_SECRET: your-secret-for-signature-verification
+      # WEBHOOK_EVENTS: task.created,task.updated,task.status_changed,task.deleted
+      # Additional webhooks: WEBHOOK_URL_1, WEBHOOK_SECRET_1, WEBHOOK_EVENTS_1, etc.
     extra_hosts:
       - "host.docker.internal:host-gateway"

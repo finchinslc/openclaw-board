@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { logActivity } from '@/lib/activity'
+import { sendWebhook, taskToWebhookPayload } from '@/lib/webhook'
 
 // Helper to safely broadcast
 function broadcast(event: string, data: unknown) {
@@ -67,6 +68,10 @@ export async function POST(request: Request) {
     await logActivity(task.id, 'created', body.actor || 'human')
 
     broadcast('task:created', task)
+    
+    // Send webhook
+    sendWebhook('task.created', taskToWebhookPayload(task))
+    
     return NextResponse.json(task, { status: 201 })
   } catch (error) {
     console.error('Error creating task:', error)

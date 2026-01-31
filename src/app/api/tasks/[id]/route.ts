@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { logActivity } from '@/lib/activity'
+import { sendWebhook, taskToWebhookPayload } from '@/lib/webhook'
 
 // Helper to safely broadcast
 function broadcast(event: string, data: unknown) {
@@ -156,6 +157,27 @@ export async function PATCH(
     
     broadcast('task:updated', task)
     
+    // Send webhooks for updates
+    const changes: { field: string; oldValue: unknown; newValue: unknown }[] = []
+    if (body.status && body.status !== currentTask.status) {
+      changes.push({ field: 'status', oldValue: currentTask.status, newValue: body.status })
+      // Send specific status_changed event
+      sendWebhook('task.status_changed', taskToWebhookPayload(task), changes)
+    }
+    if (body.title && body.title !== currentTask.title) {
+      changes.push({ field: 'title', oldValue: currentTask.title, newValue: body.title })
+    }
+    if (body.priority && body.priority !== currentTask.priority) {
+      changes.push({ field: 'priority', oldValue: currentTask.priority, newValue: body.priority })
+    }
+    if (body.isActive !== undefined && body.isActive !== currentTask.isActive) {
+      changes.push({ field: 'isActive', oldValue: currentTask.isActive, newValue: body.isActive })
+    }
+    // Send general update event if any changes
+    if (changes.length > 0) {
+      sendWebhook('task.updated', taskToWebhookPayload(task), changes)
+    }
+    
     // Auto-archive: if moving to DONE and there are 5+ completed non-archived tasks
     if (body.status === 'DONE') {
       const completedTasks = await prisma.task.findMany({
@@ -194,8 +216,18 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+    
+    // Get task before deleting for webhook
+    const task = await prisma.task.findUnique({ where: { id } })
+    
     await prisma.task.delete({ where: { id } })
     broadcast('task:deleted', { id })
+    
+    // Send webhook if task existed
+    if (task) {
+      sendWebhook('task.deleted', taskToWebhookPayload(task))
+    }
+    
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting task:', error)
