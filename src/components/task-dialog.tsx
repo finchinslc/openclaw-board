@@ -18,8 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Markdown } from '@/components/ui/markdown'
 import { Task, Priority, TaskOrigin, Comment, Subtask, Attachment, Activity } from '@/types/task'
-import { Code, ExternalLink, FileText, History, MessageSquare, Paperclip, Send, ListChecks, Plus, X } from 'lucide-react'
+import { Code, Eye, Pencil, ExternalLink, FileText, History, MessageSquare, Paperclip, Send, ListChecks, Plus, X } from 'lucide-react'
 
 interface TaskDialogProps {
   open: boolean
@@ -31,6 +32,7 @@ interface TaskDialogProps {
 export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [previewDescription, setPreviewDescription] = useState(false)
   const [priority, setPriority] = useState<Priority>('MEDIUM')
   const [origin, setOrigin] = useState<TaskOrigin>('HUMAN')
   const [tags, setTags] = useState('')
@@ -72,6 +74,7 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
     }
     setNewComment('')
     setNewSubtask('')
+    setPreviewDescription(false)
   }, [task, open])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -251,14 +254,45 @@ export function TaskDialog({ open, onOpenChange, task, onSave }: TaskDialogProps
           </div>
           
           <div>
-            <label className="text-xs sm:text-sm font-medium">Description</label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Task description (optional)"
-              rows={3}
-              className="text-sm"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs sm:text-sm font-medium">Description</label>
+              <div className="flex gap-1">
+                <Button
+                  type="button"
+                  variant={!previewDescription ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => setPreviewDescription(false)}
+                >
+                  <Pencil className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  type="button"
+                  variant={previewDescription ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => setPreviewDescription(true)}
+                  disabled={!description}
+                >
+                  <Eye className="h-3 w-3 mr-1" />
+                  Preview
+                </Button>
+              </div>
+            </div>
+            {previewDescription && description ? (
+              <div className="min-h-[80px] p-3 border rounded-md bg-muted/30">
+                <Markdown>{description}</Markdown>
+              </div>
+            ) : (
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Task description (supports Markdown)"
+                rows={3}
+                className="text-sm font-mono"
+              />
+            )}
           </div>
           
           <div className="grid grid-cols-3 gap-4">
